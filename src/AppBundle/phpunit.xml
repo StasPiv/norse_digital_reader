@@ -7,6 +7,10 @@
          colors="true"
          bootstrap="../../app/bootstrap.php.cache"
 >
+    <php>
+        <server name="KERNEL_DIR" value="../../app/" />
+    </php>
+
     <testsuites>
         <testsuite name="model">
             <directory>Tests/Model/User.php</directory>

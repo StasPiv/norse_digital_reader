@@ -5,7 +5,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="feed_user")
+ * @ORM\Table(name="feed_user",
+ * uniqueConstraints={@ORM\UniqueConstraint(name="email_idx",columns={"email"})})
  */
 class FeedUser
 {
