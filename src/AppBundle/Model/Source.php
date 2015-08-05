@@ -107,10 +107,43 @@ class Source
     }
 
     /**
+     * @throws Exception
      * @param string $source
      * @return boolean
      */
     public function update($source)
+    {
+        $entity = $this->getBySource($source);
+
+        if (is_null($entity)) {
+            return true;
+        }
+
+        if ($entity->getType() == self::SOURCE_TYPE_RSS) {
+            return $this->updateRssContent($entity);
+        } elseif ($entity->getType() == self::SOURCE_TYPE_FACEBOOK) {
+            return $this->updateFacebookContent($entity);
+        } else {
+            throw new Exception('Unknown type for source: ' . $entity->getSource());
+        }
+    }
+
+    /**
+     * @param SourceEntity $entity
+     * @return boolean
+     */
+    private function updateRssContent($entity)
+    {
+        $entity->setContent(@file_get_contents($entity->getSource()));
+        $this->getEm()->persist($entity);
+        $this->getEm()->flush();
+    }
+
+    /**
+     * @param string $source
+     * @return boolean
+     */
+    private function updateFacebookContent($source)
     {
 
     }

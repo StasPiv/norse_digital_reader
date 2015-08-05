@@ -7,6 +7,7 @@ use AppBundle\Entity\FeedSource as SourceEntity;
 
 class SourceTest extends KernelTestCase
 {
+    private $testRssSource = 'https://news.yandex.ru/hardware.rss';
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -28,7 +29,7 @@ class SourceTest extends KernelTestCase
     {
         $source = new Source();
         $source->setEm($this->em);
-        $rssSource = 'https://news.yandex.ru/hardware.rss';
+        $rssSource = $this->testRssSource;
         $this->assertTrue($source->add($rssSource));
 
         $entity = $this->em->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $rssSource]);
@@ -87,17 +88,48 @@ class SourceTest extends KernelTestCase
         $this->assertFalse($source->remove($testSource, Source::SOURCE_TYPE_FACEBOOK));
     }
 
+    public function testUpdateRss()
+    {
+        $source = new Source();
+        $source->setEm($this->em);
+
+        $source->add($this->testRssSource, Source::SOURCE_TYPE_RSS, 2);
+        $source->update($this->testRssSource);
+
+        $entity = $this->getBySource($this->testRssSource);
+
+        $content = $entity->getContent();
+
+        $this->removeSourceEntity($this->testRssSource);
+
+        $this->assertNotEmpty($content);
+    }
+
+    public function testUpdateFacebook()
+    {
+
+    }
+
     /**
      * @param $source
      */
     private function removeSourceEntity($source)
     {
-        $entity = $this->em->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
+        $entity = $this->getBySource($source);
 
         if (!is_null($entity)) {
             $this->em->remove($entity);
             $this->em->flush();
         }
+    }
+
+    /**
+     * @param $source
+     * @return SourceEntity
+     */
+    private function getBySource($source)
+    {
+        return $this->em->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
     }
 
 
