@@ -1,0 +1,6 @@
+# src/Acme/BlogBundle/Resources/config/validation.yml
+AppBundle\Entity\FeedUser:
+    properties:
+        email:
+            - NotBlank: ~
+            - Email: ~

@@ -61,6 +61,44 @@ class UserTest extends KernelTestCase
         $this->assertFalse((bool)$fail);
     }
 
+    public function testFirstRegisterAndSecondRegisterWithSameEmail()
+    {
+        $email = $this->testEmails[0];
+
+        $user = new User($email);
+        $user->setEm($this->em);
+        $this->assertTrue($user->register($this->testPassword, $this->testPassword));
+
+        $entity = $this->em->getRepository('AppBundle:FeedUser')->findOneBy(['email' => $email]);
+        $this->assertNotNull($entity);
+
+        $this->assertFalse($user->register($this->testPassword, $this->testPassword));
+
+        $this->em->remove($entity);
+        $this->em->flush();
+    }
+
+    public function testWrongRepeatPassword()
+    {
+        $email = $this->testEmails[0];
+
+        $user = new User($email);
+        $this->assertFalse($user->register($this->testPassword, $this->testPassword.'fake'));
+
+    }
+
+    public function testWrongEmail()
+    {
+        $user = new User('not_email');
+        $this->assertFalse($user->isValidEmail());
+    }
+
+    public function testSuccessfulEmail()
+    {
+        $user = new User('true_email@gmail.com');
+        $this->assertTrue($user->isValidEmail());
+    }
+
     private function createTestUsers()
     {
         foreach ($this->testEmails as $email) {

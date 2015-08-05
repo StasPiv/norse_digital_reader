@@ -1,7 +1,11 @@
 <?php
 
 namespace AppBundle\Model;
+
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
+use Symfony\Component\Validator\Validation;
+use AppBundle\Entity\FeedUser as UserEntity;
 
 class User
 {
@@ -51,7 +55,7 @@ class User
     public function auth($password)
     {
         /** @var \AppBundle\Entity\FeedUser $entity */
-        $entity = $this->getEm()->getRepository('AppBundle:FeedUser')
+        $entity = $this->getRepository()
                            ->findOneBy(['email' => $this->email, 'password' => md5($password)]);
         return !is_null($entity);
     }
@@ -63,6 +67,17 @@ class User
      */
     public function register($password, $repeatPassword)
     {
+        if (!$this->isValidEmail() || $password != $repeatPassword || $this->checkIfExists()) {
+            return false;
+        }
+
+        $entity = new UserEntity();
+        $entity->setEmail($this->email);
+        $entity->setPassword(md5($password));
+        $this->getEm()->persist($entity);
+
+        $this->getEm()->flush();
+
         return true;
     }
 
@@ -71,7 +86,11 @@ class User
      */
     public function checkIfExists()
     {
+        /** @var \AppBundle\Entity\FeedUser $entity */
+        $entity = $this->getRepository()
+                       ->findOneBy(['email' => $this->email]);
 
+        return !is_null($entity);
     }
 
     /**
@@ -87,6 +106,31 @@ class User
      */
     public function isValidEmail()
     {
+        $emailConstraint = new EmailConstraint();
+        $emailConstraint->message = 'Email is not valid';
 
+        $errors = $this->getValidator()->validate(
+            $this->email,
+            $emailConstraint
+        );
+
+        return count($errors) == 0;
+    }
+
+    /**
+     * @return \Doctrine\ORM\EntityRepository
+     * @throws Exception
+     */
+    private function getRepository()
+    {
+        return $this->getEm()->getRepository('AppBundle:FeedUser');
+    }
+
+    /**
+     * @return \Symfony\Component\Validator\ValidatorInterface
+     */
+    private function getValidator()
+    {
+        return Validation::createValidator();
     }
 }
