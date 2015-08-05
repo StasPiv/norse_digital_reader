@@ -87,6 +87,19 @@ class UserTest extends KernelTestCase
 
     }
 
+    public function testPasswordWeight()
+    {
+        $user = new User('test@gmail.com');
+
+        $this->assertEquals(1, $user->getPasswordWeight('1'));
+        $this->assertEquals(2, $user->getPasswordWeight('12345'));
+        $this->assertEquals(2, $user->getPasswordWeight('123456'));
+        $this->assertEquals(2, $user->getPasswordWeight('testlowercase123'));
+        $this->assertEquals(2, $user->getPasswordWeight('InCorrect', $str));
+        $this->assertNotEmpty($str);
+        $this->assertEquals(3, $user->getPasswordWeight('Correct666', $str), $str);
+    }
+
     public function testWrongEmail()
     {
         $user = new User('not_email');

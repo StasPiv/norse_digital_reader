@@ -95,10 +95,27 @@ class User
 
     /**
      * @param string $password
+     * @param string $error
+     * @return integer
      */
-    public function getPasswordWeight($password)
+    public function getPasswordWeight($password, &$error = '')
     {
+        if (mb_strlen($password) <= 3) {
+            $error = 'Length of password should be greater than 3';
+            return 1;
+        }
 
+        if (preg_match('/^\d+$/', $password) || preg_match('/^[a-zA-Z]+$/', $password)) {
+            $error = 'Password must contain symbols and numbers';
+            return 2;
+        }
+
+        if (strtolower($password) == $password) {
+            $error = 'Password must contain at least one symbol in upper case';
+            return 2;
+        }
+
+        return 3;
     }
 
     /**
