@@ -1,0 +1,5 @@
+_assetic:
+    resource: .
+    type: assetic
+_app:
+    resource: /home/stas/work/nurse_digital_reader/framework-standard-edition/app/config/routing_dev.yml
