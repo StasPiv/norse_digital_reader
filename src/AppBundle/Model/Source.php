@@ -62,7 +62,7 @@ class Source
             if (preg_match('/\//', $source)) {
                 return false;
             } else {
-                $source = 'https://graph.facebook.com/fg.gov.ua/posts?access_token=' . self::FB_ACCESS_TOKEN;
+                $source = $this->combineFacebookSource($source);
             }
         }
 
@@ -80,12 +80,30 @@ class Source
 
     /**
      * @param string $source
+     * @param int $type
      * @param integer $userId
-     * @return boolean
+     * @return bool
      */
-    public function remove($source, $userId = null)
+    public function remove($source, $type = self::SOURCE_TYPE_RSS, $userId = null)
     {
+        if ($type == self::SOURCE_TYPE_FACEBOOK) {
+            $source = $this->combineFacebookSource($source);
+        }
 
+        $entityForRemoving = $this->getBySource($source);
+
+        if (is_null($entityForRemoving)) {
+            return false;
+        }
+
+        $entity = $this->getEm()->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
+
+        if (!is_null($entity)) {
+            $this->getEm()->remove($entity);
+            $this->getEm()->flush();
+        }
+
+        return true;
     }
 
     /**
@@ -95,6 +113,24 @@ class Source
     public function update($source)
     {
 
+    }
+
+    /**
+     * @param string $source
+     * @return SourceEntity
+     */
+    public function getBySource($source)
+    {
+        return $this->getEm()->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
+    }
+
+    /**
+     * @param $source
+     * @return string
+     */
+    private function combineFacebookSource($source)
+    {
+        return 'https://graph.facebook.com/' . $source . '/posts?access_token=' . self::FB_ACCESS_TOKEN;
     }
 
 }

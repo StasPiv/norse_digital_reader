@@ -72,6 +72,21 @@ class SourceTest extends KernelTestCase
         $this->assertTrue($result, $entity->getSource() . ' <===> ' . $partOfFullSource);
     }
 
+    public function testRemoveSource()
+    {
+        $testSource = 'test';
+        $fullSource = 'https://graph.facebook.com/' . $testSource . '/posts?access_token=' . Source::FB_ACCESS_TOKEN;
+        $this->removeSourceEntity($fullSource);
+
+        $source = new Source();
+        $source->setEm($this->em);
+
+        $source->add($testSource, Source::SOURCE_TYPE_FACEBOOK, 2);
+
+        $this->assertTrue($source->remove($testSource, Source::SOURCE_TYPE_FACEBOOK));
+        $this->assertFalse($source->remove($testSource, Source::SOURCE_TYPE_FACEBOOK));
+    }
+
     /**
      * @param $source
      */
