@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
 use Symfony\Component\Validator\Validation;
 use AppBundle\Entity\FeedUser as UserEntity;
+use AppBundle\Tests\Model\App;
 
 class User
 {
@@ -57,7 +58,13 @@ class User
         /** @var \AppBundle\Entity\FeedUser $entity */
         $entity = $this->getRepository()
                            ->findOneBy(['email' => $this->email, 'password' => md5($password)]);
-        return !is_null($entity);
+
+        if (!is_null($entity)) {
+            App::setCurrentUserId($entity->getId());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

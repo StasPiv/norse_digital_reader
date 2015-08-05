@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Model;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use AppBundle\Model\User;
 use AppBundle\Entity\FeedUser as UserEntity;
+use AppBundle\Tests\Model\App;
 
 class UserTest extends KernelTestCase
 {
@@ -49,9 +50,11 @@ class UserTest extends KernelTestCase
         $success = $fail = true;
 
         foreach ($this->testEmails as $email) {
+            $entity = $this->findByEmail($email);
             $user = new User($email);
             $user->setEm($this->em);
             $success &= $user->auth($this->testPassword);
+            $success &= $entity->getId() == App::getCurrentUserId();
             $fail &= $user->auth($this->testPassword.'fake');
         }
 
@@ -69,7 +72,7 @@ class UserTest extends KernelTestCase
         $user->setEm($this->em);
         $this->assertTrue($user->register($this->testPassword, $this->testPassword));
 
-        $entity = $this->em->getRepository('AppBundle:FeedUser')->findOneBy(['email' => $email]);
+        $entity = $this->findByEmail($email);
         $this->assertNotNull($entity);
 
         $this->assertFalse($user->register($this->testPassword, $this->testPassword));
@@ -134,5 +137,14 @@ class UserTest extends KernelTestCase
             $this->em->remove($entity);
         }
         $this->em->flush();
+    }
+
+    /**
+     * @param $email
+     * @return \AppBundle\Entity\FeedUser
+     */
+    private function findByEmail($email)
+    {
+        return $this->em->getRepository('AppBundle:FeedUser')->findOneBy(['email' => $email]);
     }
 }

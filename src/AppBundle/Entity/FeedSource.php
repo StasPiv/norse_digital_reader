@@ -35,7 +35,7 @@ class FeedSource
     /**
      * @ORM\Column(type="string")
      */
-    protected $content;
+    protected $content = '';
 
 
     /**
