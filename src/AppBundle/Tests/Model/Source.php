@@ -8,6 +8,7 @@ use AppBundle\Entity\FeedSource as SourceEntity;
 class SourceTest extends KernelTestCase
 {
     private $testRssSource = 'https://news.yandex.ru/hardware.rss';
+    private $testFacebookSource = 'fg.gov.ua';
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -54,10 +55,9 @@ class SourceTest extends KernelTestCase
     {
         $source = new Source();
         $source->setEm($this->em);
-        $facebookSource = 'fg.gov.ua';
-        $this->assertTrue($source->add($facebookSource, Source::SOURCE_TYPE_FACEBOOK));
+        $this->assertTrue($source->add($this->testFacebookSource, Source::SOURCE_TYPE_FACEBOOK));
 
-        $fullSource = 'https://graph.facebook.com/' . $facebookSource . '/posts?access_token=' . Source::FB_ACCESS_TOKEN;
+        $fullSource = $this->combineFacebookSource($this->testFacebookSource);
 
         /** @var SourceEntity $entity */
         $entity = $this->em->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $fullSource]);
@@ -75,17 +75,16 @@ class SourceTest extends KernelTestCase
 
     public function testRemoveSource()
     {
-        $testSource = 'test';
-        $fullSource = 'https://graph.facebook.com/' . $testSource . '/posts?access_token=' . Source::FB_ACCESS_TOKEN;
+        $fullSource = $this->combineFacebookSource($this->testFacebookSource);
         $this->removeSourceEntity($fullSource);
 
         $source = new Source();
         $source->setEm($this->em);
 
-        $source->add($testSource, Source::SOURCE_TYPE_FACEBOOK, 2);
+        $source->add($this->testFacebookSource, Source::SOURCE_TYPE_FACEBOOK, 2);
 
-        $this->assertTrue($source->remove($testSource, Source::SOURCE_TYPE_FACEBOOK));
-        $this->assertFalse($source->remove($testSource, Source::SOURCE_TYPE_FACEBOOK));
+        $this->assertTrue($source->remove($this->testFacebookSource, Source::SOURCE_TYPE_FACEBOOK));
+        $this->assertFalse($source->remove($this->testFacebookSource, Source::SOURCE_TYPE_FACEBOOK));
     }
 
     public function testUpdateRss()
@@ -107,7 +106,19 @@ class SourceTest extends KernelTestCase
 
     public function testUpdateFacebook()
     {
+        $source = new Source();
+        $source->setEm($this->em);
 
+        $source->add($this->testFacebookSource, Source::SOURCE_TYPE_FACEBOOK, 2);
+        $source->update($this->testFacebookSource, Source::SOURCE_TYPE_FACEBOOK);
+
+        $entity = $this->getBySource($this->combineFacebookSource($this->testFacebookSource));
+
+        $content = $entity->getContent();
+
+        $this->removeSourceEntity($this->combineFacebookSource($this->testFacebookSource));
+
+        $this->assertNotEmpty($content);
     }
 
     /**
@@ -130,6 +141,15 @@ class SourceTest extends KernelTestCase
     private function getBySource($source)
     {
         return $this->em->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
+    }
+
+    /**
+     * @param $source
+     * @return string
+     */
+    private function combineFacebookSource($source)
+    {
+        return 'https://graph.facebook.com/' . $source . '/posts?access_token=' . Source::FB_ACCESS_TOKEN;
     }
 
 

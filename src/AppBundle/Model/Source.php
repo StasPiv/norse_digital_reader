@@ -62,7 +62,7 @@ class Source
             if (preg_match('/\//', $source)) {
                 return false;
             } else {
-                $source = $this->combineFacebookSource($source);
+                $source = $this->combineSource($source, $type);
             }
         }
 
@@ -86,9 +86,7 @@ class Source
      */
     public function remove($source, $type = self::SOURCE_TYPE_RSS, $userId = null)
     {
-        if ($type == self::SOURCE_TYPE_FACEBOOK) {
-            $source = $this->combineFacebookSource($source);
-        }
+        $source = $this->combineSource($source, $type);
 
         $entityForRemoving = $this->getBySource($source);
 
@@ -107,21 +105,23 @@ class Source
     }
 
     /**
-     * @throws Exception
+     *
      * @param string $source
-     * @return boolean
+     * @param $type
+     * @return bool
+     * @throws Exception
      */
-    public function update($source)
+    public function update($source, $type = self::SOURCE_TYPE_RSS)
     {
-        $entity = $this->getBySource($source);
+        $entity = $this->getBySource($this->combineSource($source, $type));
 
         if (is_null($entity)) {
             return true;
         }
 
-        if ($entity->getType() == self::SOURCE_TYPE_RSS) {
+        if ($type == self::SOURCE_TYPE_RSS) {
             return $this->updateRssContent($entity);
-        } elseif ($entity->getType() == self::SOURCE_TYPE_FACEBOOK) {
+        } elseif ($type == self::SOURCE_TYPE_FACEBOOK) {
             return $this->updateFacebookContent($entity);
         } else {
             throw new Exception('Unknown type for source: ' . $entity->getSource());
@@ -132,7 +132,7 @@ class Source
      * @param SourceEntity $entity
      * @return boolean
      */
-    private function updateRssContent($entity)
+    private function updateRssContent(SourceEntity $entity)
     {
         $entity->setContent(@file_get_contents($entity->getSource()));
         $this->getEm()->persist($entity);
@@ -140,12 +140,14 @@ class Source
     }
 
     /**
-     * @param string $source
+     * @param SourceEntity $entity
      * @return boolean
      */
-    private function updateFacebookContent($source)
+    private function updateFacebookContent(SourceEntity $entity)
     {
-
+        $entity->setContent(@file_get_contents($entity->getSource()));
+        $this->getEm()->persist($entity);
+        $this->getEm()->flush();
     }
 
     /**
@@ -159,10 +161,15 @@ class Source
 
     /**
      * @param $source
+     * @param $type
      * @return string
      */
-    private function combineFacebookSource($source)
+    private function combineSource($source, $type = self::SOURCE_TYPE_RSS)
     {
+        if ($type == self::SOURCE_TYPE_RSS) {
+            return $source;
+        }
+
         return 'https://graph.facebook.com/' . $source . '/posts?access_token=' . self::FB_ACCESS_TOKEN;
     }
 
