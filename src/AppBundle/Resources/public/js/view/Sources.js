@@ -63,7 +63,7 @@ var SourcesView = Backbone.View.extend({
     },
 
     showForm: function() {
-        sourceAdd.$el.show();
+        sourceAdd.$el.slideDown();
     }
 });
 

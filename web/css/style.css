@@ -28,8 +28,20 @@ input.fail {
 
 #feeds > div, #sources .content > div {
     cursor: pointer;
+    margin-bottom: 15px;
 }
 
 .selected {
     color: green;
+}
+
+#feeds {
+    float: left;
+    margin-right: 50px;
+    width: 600px;
+}
+
+#feed_full {
+    float: left;
+    width: 600px;
 }

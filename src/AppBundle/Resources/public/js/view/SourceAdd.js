@@ -7,7 +7,7 @@ var SourceViewAdd = Backbone.View.extend({
    },
 
    hideForm: function() {
-      this.$el.hide();
+      this.$el.slideUp();
    },
 
    addSource: function() {
