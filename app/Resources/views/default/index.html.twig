@@ -9,7 +9,12 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% javascripts '@AppBundle/Resources/public/js/*' output='js/compiled/main.js' %}
+    {% javascripts
+        '@AppBundle/Resources/public/js/jquery-min.js'
+        '@AppBundle/Resources/public/js/underscore.js'
+        '@AppBundle/Resources/public/js/backbone.js'
+        '@AppBundle/Resources/public/js/model/User.js'
+    %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}

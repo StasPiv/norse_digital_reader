@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class RestController extends Controller
 {
+    private $sessionKeyForCurrentUser = 'current_user_id';
+
     /**
      * @Route("/sources/{user}", defaults={"user": 1}, requirements={
      *     "user": "\d+"
@@ -157,12 +159,25 @@ class RestController extends Controller
     }
 
     /**
+     * @Route("/logout/")
+     * @Method({"PUT","POST"})
+     * @param Request $request
+     * @return string
+     */
+    public function logoutAction(Request $request)
+    {
+        $session = new Session();
+        $session->remove($this->sessionKeyForCurrentUser);
+        return new JsonResponse(['result' => true]);
+    }
+
+    /**
      * @return integer
      */
     private function getCurrentUserId()
     {
         $session = new Session();
-        return $session->get('current_user_id');
+        return $session->get($this->sessionKeyForCurrentUser);
     }
 
     /**
@@ -171,7 +186,7 @@ class RestController extends Controller
     private function setCurrentUserId($userId)
     {
         $session = new Session();
-        $session->set('current_user_id', $userId);
+        $session->set($this->sessionKeyForCurrentUser, $userId);
     }
 
 }
