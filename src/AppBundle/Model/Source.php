@@ -52,10 +52,10 @@ class Source
      * @param string $source
      * @param int $type
      * @param integer $userId
+     * @param null $sourceId
      * @return bool
-     * @throws Exception
      */
-    public function add($source, $type = self::SOURCE_TYPE_RSS, $userId = null)
+    public function add($source, $type = self::SOURCE_TYPE_RSS, $userId = null, &$sourceId = null)
     {
         if (is_null($userId)) {
             $userId = App::getCurrentUserId();
@@ -82,7 +82,10 @@ class Source
 
         $this->getEm()->flush();
 
-        $this->addSourceToUser($source, $userId);
+        if (!is_null($entity)) {
+            $sourceId = $entity->getId();
+            $this->addSourceToUser($source, $userId);
+        }
 
         return true;
     }
@@ -99,7 +102,7 @@ class Source
             $userId = App::getCurrentUserId();
         }
 
-        if (is_integer($source)) {
+        if ($source == (int)$source) {
             $entityForRemoving = $this->getById((int)$source);
             if (!is_null($entityForRemoving)) {
                 $source = $entityForRemoving->getSource();
@@ -151,8 +154,13 @@ class Source
      */
     public function update($source, $type = self::SOURCE_TYPE_RSS)
     {
-        if (is_integer($source)) {
+        if ($source == (int)$source) {
             $entity = $this->getById((int)$source);
+            if (!is_null($entity)) {
+                $type = $entity->getType();
+            } else {
+                return false;
+            }
         } else {
             $entity = $this->getBySource($this->combineSource($source, $type));
         }

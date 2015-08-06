@@ -29,6 +29,10 @@ class RestController extends Controller
      */
     public function sourcesAction($user)
     {
+        if ($user == 0) {
+            $user = $this->getCurrentUserId();
+        }
+
         $qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
 
         $qb->select(array('fs.id','fs.type','fs.source'))
@@ -37,7 +41,7 @@ class RestController extends Controller
            ->where('us.userId = ' . (int)$user)
            ->orderBy('fs.id', 'DESC');
 
-        return new JsonResponse(['users' => $qb->getQuery()->getResult()]);
+        return new JsonResponse($qb->getQuery()->getResult());
     }
 
     /**
@@ -57,11 +61,11 @@ class RestController extends Controller
            ->where('f.sourceId = ' . (int)$source)
            ->orderBy('f.id', 'DESC');
 
-        return new JsonResponse(['feeds' => $qb->getQuery()->getResult()]);
+        return new JsonResponse($qb->getQuery()->getResult());
     }
 
     /**
-     * @Route("/update/{sourceId}", defaults={"source": 0}, requirements={
+     * @Route("/source/update/{sourceId}", defaults={"source": 0}, requirements={
      *     "sourceId": "\d+"
      * })
      * @Method({"PUT"})
@@ -92,19 +96,22 @@ class RestController extends Controller
         $source = new Source();
         $source->setEm($this->getDoctrine()->getEntityManager());
 
-        return new JsonResponse(['result' => $source->add($newSource, $type, $this->getCurrentUserId())]);
+        $result = $source->add($newSource, $type, $this->getCurrentUserId(), $sourceId);
+
+        return new JsonResponse(['result' => $result, 'sourceId' => $sourceId]);
     }
 
     /**
-     * @Route("/source/remove/")
+     * @Route("/source/remove/{sourceId}"), defaults={"source": 0}, requirements={
+     *     "sourceId": "\d+"
+     * })
      * @Method({"DELETE"})
      * @param Request $request
+     * @param integer $sourceId
      * @return string
      */
-    public function removeAction(Request $request)
+    public function removeAction(Request $request, $sourceId)
     {
-        $sourceId = $request->request->get('source');
-
         $source = new Source();
         $source->setEm($this->getDoctrine()->getEntityManager());
 
@@ -112,7 +119,7 @@ class RestController extends Controller
     }
 
     /**
-     * @Route("/register/")
+     * @Route("/user/register/")
      * @Method({"POST"})
      * @param Request $request
      * @return string
@@ -136,7 +143,7 @@ class RestController extends Controller
     }
 
     /**
-     * @Route("/auth/")
+     * @Route("/user/auth/")
      * @Method({"PUT","POST"})
      * @param Request $request
      * @return string
@@ -159,7 +166,7 @@ class RestController extends Controller
     }
 
     /**
-     * @Route("/logout/")
+     * @Route("/user/logout/")
      * @Method({"PUT","POST"})
      * @param Request $request
      * @return string
