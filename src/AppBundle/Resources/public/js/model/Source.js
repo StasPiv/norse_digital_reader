@@ -59,4 +59,3 @@ var SourceCollection = Backbone.Collection.extend({
 });
 
 var sources = new SourceCollection;
-sources.fetch();
