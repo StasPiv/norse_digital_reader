@@ -103,7 +103,7 @@ class Source
             $userId = App::getCurrentUserId();
         }
 
-        if ($source == (int)$source) {
+        if (is_integer($source)) {
             $entityForRemoving = $this->getById((int)$source);
             if (!is_null($entityForRemoving)) {
                 $source = $entityForRemoving->getSource();
@@ -155,7 +155,7 @@ class Source
      */
     public function update($source, $type = self::SOURCE_TYPE_RSS)
     {
-        if ($source == (int)$source) {
+        if (is_integer($source)) {
             $entity = $this->getById((int)$source);
             if (!is_null($entity)) {
                 $type = $entity->getType();
@@ -250,7 +250,7 @@ class Source
         $feeds = [];
         foreach ($this->getEm()->getRepository('AppBundle:Feed')->findBy(['sourceId' => $entity->getId()]) as $feed) {
             /** @var FeedEntity $feed */
-            $feeds[$feed->getTitle()] = $feed->getContent();
+            $feeds[(string)$feed->getTitle()] = $feed->getContent();
         }
         return $feeds;
     }
