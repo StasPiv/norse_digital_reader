@@ -5,8 +5,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="feed_source",
- * uniqueConstraints={@ORM\UniqueConstraint(name="source_idx",columns={"source"})})
  */
 class FeedSource
 {
