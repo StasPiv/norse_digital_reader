@@ -10,12 +10,18 @@ class Rss implements IParser
      */
     public function getItems($content)
     {
-        return [
-            [
-                'title' => 'test',
-                'content' => 'content'
-            ]
-        ];
+        $xml = simplexml_load_string($content);
+
+        $items  = [];
+
+        foreach ($xml->channel->item as $item) {
+            $items[] = [
+                'title' => $item->title,
+                'content' => $item->description
+            ];
+        }
+
+        return $items;
     }
 
 }
