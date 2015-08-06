@@ -122,9 +122,14 @@ class SourceTest extends KernelTestCase
 
         $content = $entity->getContent();
 
-        $this->removeSourceEntity($this->combineFacebookSource($this->testFacebookSource));
+        $sourceId = $entity->getId();
+        $countFeeds = count($this->getFeedsBySourceId($sourceId));
+
+        $source->remove($this->testFacebookSource, Source::SOURCE_TYPE_FACEBOOK);
 
         $this->assertNotEmpty($content);
+        $this->assertGreaterThan(0, $countFeeds);
+        $this->assertEquals(0, count($this->getFeedsBySourceId($sourceId)));
     }
 
     /**

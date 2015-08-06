@@ -10,7 +10,18 @@ class Facebook implements IParser
      */
     public function getItems($content)
     {
-        // TODO: Implement getItems() method.
+        $data = json_decode($content, true);
+
+        $items = [];
+
+        foreach ($data['data'] as $item) {
+            $items[] = [
+                'title' => $item['id'],
+                'content' => $item['message']
+            ];
+        }
+
+        return $items;
     }
 
 }

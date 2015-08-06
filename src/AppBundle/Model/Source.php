@@ -181,8 +181,26 @@ class Source
     private function updateFacebookContent(SourceEntity $entity)
     {
         $entity->setContent(@file_get_contents($entity->getSource()));
+
+        if (!$entity->getContent()) {
+            return false;
+        }
+
+        $parser = new FacebookParser();
+        $items = $parser->getItems($entity->getContent());
+
+        foreach ($items as $item) {
+            $feedEntity = new FeedEntity();
+            $feedEntity->setTitle($item['title']);
+            $feedEntity->setContent($item['content']);
+            $feedEntity->setSourceId($entity->getId());
+            $this->getEm()->persist($feedEntity);
+        }
+
         $this->getEm()->persist($entity);
         $this->getEm()->flush();
+
+        return true;
     }
 
     /**
