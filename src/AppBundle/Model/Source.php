@@ -4,11 +4,13 @@ namespace AppBundle\Model;
 
 use AppBundle\Entity\Feed as FeedEntity;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Validator\Validation;
 use AppBundle\Entity\FeedSource as SourceEntity;
 use AppBundle\Entity\FeedUser as UserEntity;
 use AppBundle\Entity\UserSource as UserSourceEntity;
-use AppBundle\Tests\Model\App;
+use AppBundle\Model\App;
 use AppBundle\Parser\IParser;
 use AppBundle\Parser\Facebook as FacebookParser;
 use AppBundle\Parser\Rss as RssParser;
@@ -97,9 +99,16 @@ class Source
             $userId = App::getCurrentUserId();
         }
 
-        $source = $this->combineSource($source, $type);
+        if (is_integer($source)) {
+            $entityForRemoving = $this->getById((int)$source);
+            if (!is_null($entityForRemoving)) {
+                $source = $entityForRemoving->getSource();
+            }
+        } else {
+            $source = $this->combineSource($source, $type);
+            $entityForRemoving = $this->getBySource($source);
+        }
 
-        $entityForRemoving = $this->getBySource($source);
 
         if (is_null($entityForRemoving)) {
             return false;
@@ -142,7 +151,11 @@ class Source
      */
     public function update($source, $type = self::SOURCE_TYPE_RSS)
     {
-        $entity = $this->getBySource($this->combineSource($source, $type));
+        if (is_integer($source)) {
+            $entity = $this->getById((int)$source);
+        } else {
+            $entity = $this->getBySource($this->combineSource($source, $type));
+        }
 
         if (is_null($entity)) {
             return true;
@@ -240,6 +253,15 @@ class Source
     public function getBySource($source)
     {
         return $this->getEm()->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
+    }
+
+    /**
+     * @param integer $id
+     * @return SourceEntity
+     */
+    public function getById($id)
+    {
+        return $this->getEm()->getRepository('AppBundle:FeedSource')->findOneBy(['id' => $id]);
     }
 
     /**

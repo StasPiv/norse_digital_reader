@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
 use Symfony\Component\Validator\Validation;
 use AppBundle\Entity\FeedUser as UserEntity;
-use AppBundle\Tests\Model\App;
+use AppBundle\Model\App;
 
 class User
 {
@@ -51,15 +51,17 @@ class User
 
     /**
      * @param string $password
-     * @return boolean
+     * @param null $userId
+     * @return bool
      */
-    public function auth($password)
+    public function auth($password, &$userId = null)
     {
         /** @var \AppBundle\Entity\FeedUser $entity */
         $entity = $this->getRepository()
                            ->findOneBy(['email' => $this->email, 'password' => md5($password)]);
 
         if (!is_null($entity)) {
+            $userId = $entity->getId();
             App::setCurrentUserId($entity->getId());
             return true;
         } else {
@@ -70,9 +72,11 @@ class User
     /**
      * @param $password
      * @param $repeatPassword
-     * @return boolean
+     * @param null $userId
+     * @return bool
+     * @throws Exception
      */
-    public function register($password, $repeatPassword)
+    public function register($password, $repeatPassword, &$userId = null)
     {
         if (!$this->isValidEmail() || $password != $repeatPassword || $this->checkIfExists()) {
             return false;
@@ -84,6 +88,8 @@ class User
         $this->getEm()->persist($entity);
 
         $this->getEm()->flush();
+
+        $userId = $entity->getId();
 
         return true;
     }

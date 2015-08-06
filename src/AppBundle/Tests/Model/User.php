@@ -4,7 +4,7 @@ namespace AppBundle\Tests\Model;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use AppBundle\Model\User;
 use AppBundle\Entity\FeedUser as UserEntity;
-use AppBundle\Tests\Model\App;
+use AppBundle\Model\App;
 
 class UserTest extends KernelTestCase
 {
@@ -55,7 +55,7 @@ class UserTest extends KernelTestCase
             $user->setEm($this->em);
             $success &= $user->auth($this->testPassword);
             $success &= $entity->getId() == App::getCurrentUserId();
-            $fail &= $user->auth($this->testPassword.'fake');
+            $fail &= $user->auth($this->testPassword . 'fake');
         }
 
         $this->deleteTestUsers();
@@ -86,7 +86,7 @@ class UserTest extends KernelTestCase
         $email = $this->testEmails[0];
 
         $user = new User($email);
-        $this->assertFalse($user->register($this->testPassword, $this->testPassword.'fake'));
+        $this->assertFalse($user->register($this->testPassword, $this->testPassword . 'fake'));
 
     }
 

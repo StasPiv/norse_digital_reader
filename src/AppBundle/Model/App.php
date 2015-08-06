@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Tests\Model;
+namespace AppBundle\Model;
 
 final class App
 {
