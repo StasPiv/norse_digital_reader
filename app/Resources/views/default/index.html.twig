@@ -3,7 +3,46 @@
 {% block body %}
     <div id="wrapper">
         <div id="container">
-
+            <div id="authorization">
+                <table>
+                    <tr>
+                        <td><label for="email">Email</label></td>
+                        <td><input type="text" id="email" /></td>
+                    </tr>
+                    <tr>
+                        <td><label for="password">Password</label></td>
+                        <td><input type="password" id="password" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input id="enter" type="submit" value="Enter" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="registration">
+                <table>
+                    <tr>
+                        <td><label for="email">Email</label></td>
+                        <td><input type="text" id="email" /></td>
+                    </tr>
+                    <tr>
+                        <td><label for="password">Password</label></td>
+                        <td><input type="password" id="password" /></td>
+                    </tr>
+                    <tr>
+                        <td><label for="password">Repeat Password</label></td>
+                        <td><input type="password" id="password" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <input id="register" type="submit" value="Register" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="sources"></div>
+            <div id="feeds"></div>
         </div>
     </div>
 {% endblock %}
@@ -16,6 +55,7 @@
         '@AppBundle/Resources/public/js/model/User.js'
         '@AppBundle/Resources/public/js/model/Source.js'
         '@AppBundle/Resources/public/js/model/Feed.js'
+        '@AppBundle/Resources/public/js/view/Authorization.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
