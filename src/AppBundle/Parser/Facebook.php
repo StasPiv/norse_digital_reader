@@ -15,9 +15,14 @@ class Facebook implements IParser
         $items = [];
 
         foreach ($data['data'] as $item) {
+            if (isset($item['message'])) {
+                $content = $item['message'];
+            } elseif (isset($item['story'])) {
+                $content = $item['story'];
+            }
             $items[] = [
                 'title' => $item['id'],
-                'content' => $item['message']
+                'content' => $content
             ];
         }
 

@@ -1,3 +1,7 @@
+input {
+    border-radius: 5px;
+}
+
 input.fail {
     background-color: red;
 }
@@ -28,11 +32,19 @@ input.fail {
 
 #feeds > div, #sources .content > div {
     cursor: pointer;
-    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+#feeds > div:nth-child(2n), #sources .content > div:nth-child(2n) {
+    background-color: #bce8f1;
+}
+
+#feeds > div:nth-child(2n + 1), #sources .content > div:nth-child(2n + 1) {
+    background-color: #fffffa;
 }
 
 .selected {
-    color: green;
+    color: green!important;
 }
 
 #feeds {
