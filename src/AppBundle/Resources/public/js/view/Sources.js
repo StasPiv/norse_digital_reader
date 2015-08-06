@@ -33,6 +33,11 @@ var SourcesView = Backbone.View.extend({
             }
         }
         this.remove.hide();
+        if (!loginState) {
+            this.add.hide();
+        } else {
+            this.add.show();
+        }
 
         return this;
     },

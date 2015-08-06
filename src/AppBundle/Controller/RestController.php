@@ -83,6 +83,20 @@ class RestController extends Controller
     }
 
     /**
+     * @Route("/get_password_weight/{password}", defaults={"password": 0}, requirements={
+     *     "password": ".*"
+     * })
+     * @Method({"GET"})
+     * @param integer $password
+     * @return string
+     */
+    public function getPasswordWeightAction($password)
+    {
+        $user = new User('fake');
+        return new JsonResponse($user->getPasswordWeight($password));
+    }
+
+    /**
      * @Route("/source/add/")
      * @Method({"PUT","POST"})
      * @param Request $request

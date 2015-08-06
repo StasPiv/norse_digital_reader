@@ -4,6 +4,7 @@ namespace AppBundle\Model;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
+use Symfony\Component\Validator\Constraints\NotBlank as NotBlankConstraint;
 use Symfony\Component\Validator\Validation;
 use AppBundle\Entity\FeedUser as UserEntity;
 use AppBundle\Model\App;
@@ -141,7 +142,10 @@ class User
 
         $errors = $this->getValidator()->validate(
             $this->email,
-            $emailConstraint
+            [
+                $emailConstraint,
+                new NotBlankConstraint()
+            ]
         );
 
         return count($errors) == 0;

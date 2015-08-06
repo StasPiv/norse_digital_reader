@@ -7,3 +7,21 @@ input.fail {
 #source_add {
     display: none;
 }
+.password_weight {
+    float: right;
+    height: 24px;
+    margin-left: 9px;
+    width: 50px;
+}
+
+.password_weight.good {
+    background-color: green;
+}
+
+.password_weight.middle {
+    background-color: yellow;
+}
+
+.password_weight.bad {
+    background-color: red;
+}
