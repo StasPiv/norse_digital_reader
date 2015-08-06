@@ -132,6 +132,24 @@ class SourceTest extends KernelTestCase
         $this->assertEquals(0, count($this->getFeedsBySourceId($sourceId)));
     }
 
+    public function testDenyRemoveWhenAnotherUserHaveSameSource()
+    {
+        $source = new Source();
+        $source->setEm($this->em);
+
+        $source1 = $this->testRssSource.'deny';
+        $source->add($source1, Source::SOURCE_TYPE_RSS, 101);
+        $source->add($source1, Source::SOURCE_TYPE_RSS, 102);
+
+        $source->remove($source1, Source::SOURCE_TYPE_RSS, 101);
+
+        $this->assertGreaterThan(0, count($this->getAllBySource($source1)));
+
+        $source->remove($source1, Source::SOURCE_TYPE_RSS, 102);
+
+        $this->assertEquals(0, count($this->getAllBySource($source1)));
+    }
+
     /**
      * @param $source
      */
@@ -152,6 +170,15 @@ class SourceTest extends KernelTestCase
     private function getBySource($source)
     {
         return $this->em->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
+    }
+
+    /**
+     * @param $source
+     * @return array
+     */
+    private function getAllBySource($source)
+    {
+        return $this->em->getRepository('AppBundle:FeedSource')->findBy(['source' => $source]);
     }
 
     /**

@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\Validation;
 use AppBundle\Entity\FeedSource as SourceEntity;
 use AppBundle\Entity\FeedUser as UserEntity;
+use AppBundle\Entity\UserSource as UserSourceEntity;
 use AppBundle\Tests\Model\App;
 use AppBundle\Parser\IParser;
 use AppBundle\Parser\Facebook as FacebookParser;
@@ -54,10 +55,6 @@ class Source
      */
     public function add($source, $type = self::SOURCE_TYPE_RSS, $userId = null)
     {
-        if (0) {
-            return false;
-        }
-
         if (is_null($userId)) {
             $userId = App::getCurrentUserId();
         }
@@ -70,14 +67,20 @@ class Source
             }
         }
 
+        $existingEntity = $this->getBySource($source);
+
+        if (!is_null($existingEntity)) {
+            return $this->addSourceToUser($source, $userId);
+        }
 
         $entity = new SourceEntity();
         $entity->setSource($source);
-        $entity->setUserId($userId);
         $entity->setType($type);
         $this->getEm()->persist($entity);
 
         $this->getEm()->flush();
+
+        $this->addSourceToUser($source, $userId);
 
         return true;
     }
@@ -90,6 +93,10 @@ class Source
      */
     public function remove($source, $type = self::SOURCE_TYPE_RSS, $userId = null)
     {
+        if (is_null($userId)) {
+            $userId = App::getCurrentUserId();
+        }
+
         $source = $this->combineSource($source, $type);
 
         $entityForRemoving = $this->getBySource($source);
@@ -102,9 +109,13 @@ class Source
         $entity = $this->getEm()->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
 
         if (!is_null($entity)) {
-            $this->removeAllFeeds($entity);
-            $this->getEm()->remove($entity);
-            $this->getEm()->flush();
+            $this->removeUserSource($userId, $entity->getId());
+
+            if (!$this->checkIfAnyUserHaveSource($entity->getId())) {
+                $this->removeAllFeeds($entity);
+                $this->getEm()->remove($entity);
+                $this->getEm()->flush();
+            }
         }
 
         return true;
@@ -216,7 +227,8 @@ class Source
     {
         $feeds = [];
         foreach ($this->getEm()->getRepository('AppBundle:Feed')->findBy(['sourceId' => $entity->getId()]) as $feed) {
-            $feeds[$feed['title']] = $feed['content'];
+            /** @var FeedEntity $feed */
+            $feeds[$feed->getTitle()] = $feed->getContent();
         }
         return $feeds;
     }
@@ -242,6 +254,68 @@ class Source
         }
 
         return 'https://graph.facebook.com/' . $source . '/posts?access_token=' . self::FB_ACCESS_TOKEN;
+    }
+
+    /**
+     * @param $source
+     * @param $userId
+     * @throws Exception
+     * @return boolean
+     */
+    private function addSourceToUser($source, $userId)
+    {
+        $existingEntity = $this->getBySource($source);
+
+        if ($this->checkIfUserHaveSource($userId, $existingEntity->getId())) {
+            return false;
+        }
+
+        $userSourceEntity = new UserSourceEntity();
+        $userSourceEntity->setSourceId($existingEntity->getId());
+        $userSourceEntity->setUserId($userId);
+        $this->getEm()->persist($userSourceEntity);
+        $this->getEm()->flush();
+
+        return true;
+    }
+
+    /**
+     * @param integer $userId
+     * @param integer $sourceId
+     * @return boolean
+     */
+    private function checkIfUserHaveSource($userId, $sourceId)
+    {
+        return count($this->getEm()->getRepository('AppBundle:UserSource')
+                             ->findBy(['sourceId' => $sourceId, 'userId' => $userId])) > 0;
+    }
+
+    /**
+     * @param integer $userId
+     * @param integer $sourceId
+     * @return boolean
+     */
+    private function removeUserSource($userId, $sourceId)
+    {
+        $entity = $this->getEm()->getRepository('AppBundle:UserSource')->findOneBy(['sourceId' => $sourceId, 'userId' => $userId]);
+
+        if (is_null($entity)) {
+            return false;
+        }
+
+        $this->getEm()->remove($entity);
+        $this->getEm()->flush();
+
+        return true;
+    }
+
+    /**
+     * @param integer $sourceId
+     * @return boolean
+     */
+    private function checkIfAnyUserHaveSource($sourceId)
+    {
+        return count($this->getEm()->getRepository('AppBundle:UserSource')->findBy(['sourceId' => $sourceId])) > 0;
     }
 
 }

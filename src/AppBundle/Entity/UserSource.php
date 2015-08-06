@@ -25,4 +25,60 @@ class UserSource
      * @ORM\Column(type="integer")
      */
     protected $userId;
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set sourceId
+     *
+     * @param integer $sourceId
+     * @return UserSource
+     */
+    public function setSourceId($sourceId)
+    {
+        $this->sourceId = $sourceId;
+
+        return $this;
+    }
+
+    /**
+     * Get sourceId
+     *
+     * @return integer 
+     */
+    public function getSourceId()
+    {
+        return $this->sourceId;
+    }
+
+    /**
+     * Set userId
+     *
+     * @param integer $userId
+     * @return UserSource
+     */
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+
+        return $this;
+    }
+
+    /**
+     * Get userId
+     *
+     * @return integer 
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
 }
