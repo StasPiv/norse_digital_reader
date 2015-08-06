@@ -193,13 +193,32 @@ class Source
      */
     private function updateFeeds(IParser $parser, SourceEntity $entity)
     {
+        $existingFeeds = $this->getFeedsHashMap($entity);
+
         foreach ($parser->getItems($entity->getContent()) as $item) {
+            if (isset($existingFeeds[(string)$item['title']])) {
+                continue;
+            }
+
             $feedEntity = new FeedEntity();
             $feedEntity->setTitle($item['title']);
             $feedEntity->setContent($item['content']);
             $feedEntity->setSourceId($entity->getId());
             $this->getEm()->persist($feedEntity);
         }
+    }
+
+    /**
+     * @param SourceEntity $entity
+     * @return array
+     */
+    private function getFeedsHashMap(SourceEntity $entity)
+    {
+        $feeds = [];
+        foreach ($this->getEm()->getRepository('AppBundle:Feed')->findBy(['sourceId' => $entity->getId()]) as $feed) {
+            $feeds[$feed['title']] = $feed['content'];
+        }
+        return $feeds;
     }
 
     /**
