@@ -1,3 +1,9 @@
 input.fail {
     background-color: red;
 }
+#registration {
+    display: none;
+}
+#source_add {
+    display: none;
+}

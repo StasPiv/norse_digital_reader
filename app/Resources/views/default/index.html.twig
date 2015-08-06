@@ -1,10 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    {% set currentUserId = app.session.get('current_user_id') %}
+    <script>
+        var loginState = {%  if currentUserId == 0 %}false{% else %}true{% endif %};
+    </script>
     <div id="wrapper">
         <div id="container">
             <div id="authorization">
-                <table>
+                <table class="login">
                     <tr>
                         <td><label for="email">Email</label></td>
                         <td><input type="text" id="email" /></td>
@@ -14,8 +18,18 @@
                         <td><input type="password" id="password" /></td>
                     </tr>
                     <tr>
+                        <td>
+                            <input id="enter" type="button" value="Enter" />
+                        </td>
+                        <td>
+                            <input id="show_register" type="button" value="Registration" />
+                        </td>
+                    </tr>
+                </table>
+                <table class="logout">
+                    <tr>
                         <td colspan="2">
-                            <input id="enter" type="submit" value="Enter" />
+                            <input id="logout" type="button" value="Logout" />
                         </td>
                     </tr>
                 </table>
@@ -31,19 +45,56 @@
                         <td><input type="password" id="password" /></td>
                     </tr>
                     <tr>
-                        <td><label for="password">Repeat Password</label></td>
+                        <td><label for="repeat_password">Repeat Password</label></td>
                         <td><input type="password" id="repeat_password" /></td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <input id="register" type="submit" value="Register" />
+                            <input id="register" type="button" value="Register" />
                         </td>
                     </tr>
                 </table>
             </div>
-            <div id="sources"></div>
+            <div id="sources">
+                <div class="content"></div>
+                <table>
+                    <tr>
+                        <td>
+                            <input type="button" class="add_source" value="Add" />
+                        </td>
+                        <td>
+                            <input type="button" class="remove_source" value="Remove" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
             <div id="feeds"></div>
             <div id="feed_full"></div>
+            <div id="source_add">
+                <table>
+                    <tr>
+                        <td><input type="radio" name="type" id="type_rss" value="1" /></td>
+                        <td><label for="type_rss">RSS</label></td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" name="type" id="type_facebook" value="2" /></td>
+                        <td><label for="type_facebook">Facebook</label></td>
+                    </tr>
+                    <tr>
+                        <td><label for="source_text">Source</label></td>
+                        <td><input type="text" name="source" id="source_text" /></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="button" class="add" value="Add" />
+                        </td>
+                        <td>
+                            <input type="button" class="cancel" value="Cancel" />
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
             <script id="source" type="text/template">
                 <strong><%= source %></strong>
             </script>
@@ -72,6 +123,7 @@
         '@AppBundle/Resources/public/js/view/Feed.js'
         '@AppBundle/Resources/public/js/view/Feeds.js'
         '@AppBundle/Resources/public/js/view/FeedExtended.js'
+        '@AppBundle/Resources/public/js/view/SourceAdd.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}

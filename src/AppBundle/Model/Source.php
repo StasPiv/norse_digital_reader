@@ -84,6 +84,7 @@ class Source
 
         if (!is_null($entity)) {
             $sourceId = $entity->getId();
+            $this->update($sourceId);
             $this->addSourceToUser($source, $userId);
         }
 

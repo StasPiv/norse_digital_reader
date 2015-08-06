@@ -6,6 +6,7 @@ var User = Backbone.Model.extend({
     },
     auth: function(email, password) {
         this.callApi('auth/', {email: email, password: password}, 'POST', function(data) {
+            loginState = data.result;
             authorizationWindow.trigger(data.result ? 'success' : 'fail');
         });
     },
@@ -16,7 +17,10 @@ var User = Backbone.Model.extend({
             });
     },
     logout: function() {
-        this.callApi('logout/', null, 'POST');
+        this.callApi('logout/', null, 'POST', function(data) {
+            loginState = !data.result;
+            authorizationWindow.trigger('logout');
+        });
     },
     callApi: function(apiCall, params, method, callback) {
         $.ajax({

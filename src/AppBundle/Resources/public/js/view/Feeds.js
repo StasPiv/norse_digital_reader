@@ -19,4 +19,4 @@ var FeedsView = Backbone.View.extend({
     }
 });
 
-new FeedsView();
+var feedsView = new FeedsView();

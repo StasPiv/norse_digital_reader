@@ -30,6 +30,8 @@ var Registration = Backbone.View.extend({
 
     success: function() {
         this.$el.hide();
+        loginState = true;
+        authorizationWindow.trigger('success');
     },
 
     fail: function() {
