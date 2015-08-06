@@ -18,11 +18,6 @@ class FeedSource
     /**
      * @ORM\Column(type="integer")
      */
-    protected $userId;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
     protected $type;
 
     /**
