@@ -2,8 +2,8 @@ var Registration = Backbone.View.extend({
     el: '#registration',
 
     selectors: {
-        email: '#email',
-        password: '#password',
+        email: '#register_email',
+        password: '#register_password',
         repeatPassword: '#repeat_password',
         passwordWeight: '.password_weight'
     },
