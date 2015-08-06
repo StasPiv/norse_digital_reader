@@ -2,11 +2,14 @@
 
 namespace AppBundle\Model;
 
+use AppBundle\Entity\Feed as FeedEntity;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Validator\Validation;
 use AppBundle\Entity\FeedSource as SourceEntity;
 use AppBundle\Entity\FeedUser as UserEntity;
 use AppBundle\Tests\Model\App;
+use AppBundle\Parser\Facebook as FacebookParser;
+use AppBundle\Parser\Rss as RssParser;
 
 class Source
 {
@@ -43,7 +46,7 @@ class Source
 
     /**
      * @param string $source
-     * @param string $type
+     * @param int $type
      * @param integer $userId
      * @return bool
      * @throws Exception
@@ -94,14 +97,28 @@ class Source
             return false;
         }
 
+        /** @var SourceEntity $entity */
         $entity = $this->getEm()->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
 
         if (!is_null($entity)) {
+            $this->removeAllFeeds($entity);
             $this->getEm()->remove($entity);
             $this->getEm()->flush();
         }
 
         return true;
+    }
+
+    /**
+     * @param SourceEntity $entity
+     */
+    private function removeAllFeeds(SourceEntity $entity)
+    {
+        $feeds = $this->getEm()->getRepository('AppBundle:Feed')->findBy(['sourceId' => $entity->getId()]);
+
+        foreach ($feeds as $feed) {
+            $this->getEm()->remove($feed);
+        }
     }
 
     /**
@@ -135,8 +152,26 @@ class Source
     private function updateRssContent(SourceEntity $entity)
     {
         $entity->setContent(@file_get_contents($entity->getSource()));
+
+        if (!$entity->getContent()) {
+            return false;
+        }
+
+        $parser = new RssParser();
+        $items = $parser->getItems($entity->getContent());
+
+        foreach ($items as $item) {
+            $feedEntity = new FeedEntity();
+            $feedEntity->setTitle($item['title']);
+            $feedEntity->setContent($item['content']);
+            $feedEntity->setSourceId($entity->getId());
+            $this->getEm()->persist($feedEntity);
+        }
+
         $this->getEm()->persist($entity);
         $this->getEm()->flush();
+
+        return true;
     }
 
     /**

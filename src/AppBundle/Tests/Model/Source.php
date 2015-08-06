@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Model;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use AppBundle\Model\Source;
 use AppBundle\Entity\FeedSource as SourceEntity;
+use AppBundle\Entity\Feed as FeedEntity;
 
 class SourceTest extends KernelTestCase
 {
@@ -99,9 +100,14 @@ class SourceTest extends KernelTestCase
 
         $content = $entity->getContent();
 
-        $this->removeSourceEntity($this->testRssSource);
+        $sourceId = $entity->getId();
+        $countFeeds = count($this->getFeedsBySourceId($sourceId));
+
+        $source->remove($this->testRssSource);
 
         $this->assertNotEmpty($content);
+        $this->assertGreaterThan(0, $countFeeds);
+        $this->assertEquals(0, count($this->getFeedsBySourceId($sourceId)));
     }
 
     public function testUpdateFacebook()
@@ -141,6 +147,15 @@ class SourceTest extends KernelTestCase
     private function getBySource($source)
     {
         return $this->em->getRepository('AppBundle:FeedSource')->findOneBy(['source' => $source]);
+    }
+
+    /**
+     * @param $sourceId
+     * @return FeedEntity[]
+     */
+    private function getFeedsBySourceId($sourceId)
+    {
+        return $this->em->getRepository('AppBundle:Feed')->findBy(['sourceId' => $sourceId]);
     }
 
     /**
