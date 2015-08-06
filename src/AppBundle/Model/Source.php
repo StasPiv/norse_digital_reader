@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Validation;
 use AppBundle\Entity\FeedSource as SourceEntity;
 use AppBundle\Entity\FeedUser as UserEntity;
 use AppBundle\Tests\Model\App;
+use AppBundle\Parser\IParser;
 use AppBundle\Parser\Facebook as FacebookParser;
 use AppBundle\Parser\Rss as RssParser;
 
@@ -157,16 +158,7 @@ class Source
             return false;
         }
 
-        $parser = new RssParser();
-        $items = $parser->getItems($entity->getContent());
-
-        foreach ($items as $item) {
-            $feedEntity = new FeedEntity();
-            $feedEntity->setTitle($item['title']);
-            $feedEntity->setContent($item['content']);
-            $feedEntity->setSourceId($entity->getId());
-            $this->getEm()->persist($feedEntity);
-        }
+        $this->updateFeeds(new RssParser(), $entity);
 
         $this->getEm()->persist($entity);
         $this->getEm()->flush();
@@ -186,21 +178,28 @@ class Source
             return false;
         }
 
-        $parser = new FacebookParser();
-        $items = $parser->getItems($entity->getContent());
+        $this->updateFeeds(new FacebookParser(), $entity);
 
-        foreach ($items as $item) {
+        $this->getEm()->persist($entity);
+        $this->getEm()->flush();
+
+        return true;
+    }
+
+    /**
+     * @param IParser $parser
+     * @param SourceEntity $entity
+     * @throws Exception
+     */
+    private function updateFeeds(IParser $parser, SourceEntity $entity)
+    {
+        foreach ($parser->getItems($entity->getContent()) as $item) {
             $feedEntity = new FeedEntity();
             $feedEntity->setTitle($item['title']);
             $feedEntity->setContent($item['content']);
             $feedEntity->setSourceId($entity->getId());
             $this->getEm()->persist($feedEntity);
         }
-
-        $this->getEm()->persist($entity);
-        $this->getEm()->flush();
-
-        return true;
     }
 
     /**
