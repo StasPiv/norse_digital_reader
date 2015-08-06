@@ -10,4 +10,3 @@ parameters:
     mailer_user: null
     mailer_password: null
     secret: NurseDigitalReader
-    database_path: data/nurse_digital.db
