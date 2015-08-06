@@ -9,6 +9,10 @@ var Source = Backbone.Model.extend({
         var feeds = new FeedCollection();
         feeds.url = '/api/feeds/' + this.get('id');
         this.set('feeds', feeds);
+        var that = this;
+        setInterval(function() {
+            that.update(that.get('id'));
+        }, 5000 * 60);
     },
     fetchFeeds: function() {
         this.get('feeds').fetch();
