@@ -10,7 +10,10 @@ var User = Backbone.Model.extend({
         });
     },
     register: function(email, password, repeatPassword) {
-        this.callApi('register/', {email: email, password: password, repeat: repeatPassword}, 'POST');
+        this.callApi('register/', {email: email, password: password, repeat: repeatPassword}, 'POST',
+            function(data) {
+                registrationWindow.trigger(data.result ? 'success' : 'fail');
+            });
     },
     logout: function() {
         this.callApi('logout/', null, 'POST');
