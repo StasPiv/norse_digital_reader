@@ -9,3 +9,5 @@ var Feed = Backbone.Model.extend({
 var FeedCollection = Backbone.Collection.extend({
     model: Feed
 });
+
+var feeds = new FeedCollection();

@@ -41,12 +41,13 @@
                     </tr>
                 </table>
             </div>
-            <div id="sources">
-
-            </div>
+            <div id="sources"></div>
             <div id="feeds"></div>
             <script id="source" type="text/template">
                 <strong><%= source %></strong>
+            </script>
+            <script id="feed" type="text/template">
+                <strong><%= title %></strong>
             </script>
         </div>
     </div>
@@ -64,6 +65,8 @@
         '@AppBundle/Resources/public/js/view/Registration.js'
         '@AppBundle/Resources/public/js/view/Source.js'
         '@AppBundle/Resources/public/js/view/Sources.js'
+        '@AppBundle/Resources/public/js/view/Feed.js'
+        '@AppBundle/Resources/public/js/view/Feeds.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
