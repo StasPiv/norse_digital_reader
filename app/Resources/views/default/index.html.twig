@@ -43,11 +43,15 @@
             </div>
             <div id="sources"></div>
             <div id="feeds"></div>
+            <div id="feed_full"></div>
             <script id="source" type="text/template">
                 <strong><%= source %></strong>
             </script>
             <script id="feed" type="text/template">
                 <strong><%= title %></strong>
+            </script>
+            <script id="feed_extended" type="text/template">
+                <div class="content"><%= content %></div>
             </script>
         </div>
     </div>
@@ -67,6 +71,7 @@
         '@AppBundle/Resources/public/js/view/Sources.js'
         '@AppBundle/Resources/public/js/view/Feed.js'
         '@AppBundle/Resources/public/js/view/Feeds.js'
+        '@AppBundle/Resources/public/js/view/FeedExtended.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
