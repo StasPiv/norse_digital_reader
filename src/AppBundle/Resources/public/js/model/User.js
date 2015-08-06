@@ -20,6 +20,7 @@ var User = Backbone.Model.extend({
         this.callApi('logout/', null, 'POST', function(data) {
             loginState = !data.result;
             authorizationWindow.trigger('logout');
+            sources.fetch();
         });
     },
     callApi: function(apiCall, params, method, callback) {

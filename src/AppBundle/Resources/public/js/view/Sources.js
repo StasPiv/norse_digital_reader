@@ -29,14 +29,22 @@ var SourcesView = Backbone.View.extend({
             sourceView.render();
             this.content.append(sourceView.$el);
             if (i == 0) {
-                sourceView.fetchFeedsAndSetCurrent();
+                sourceView.fetchFeedsAndSetCurrentAndColorize();
             }
         }
-        this.remove.hide();
+
+        if (!this.currentModel) {
+            this.remove.hide();
+        }
+
         if (!loginState) {
-            this.add.hide();
+            this.$el.hide();
         } else {
-            this.add.show();
+            this.$el.show();
+        }
+
+        if (sources.length == 0) {
+            this.content.html('You haven\'t added sources yet');
         }
 
         return this;
@@ -46,6 +54,7 @@ var SourcesView = Backbone.View.extend({
         this.currentModel.remove();
         sources.fetch();
         feeds.fetch();
+        feedsView.empty();
     },
 
     setCurrentModel: function(model) {

@@ -25,3 +25,11 @@ input.fail {
 .password_weight.bad {
     background-color: red;
 }
+
+#feeds > div, #sources .content > div {
+    cursor: pointer;
+}
+
+.selected {
+    color: green;
+}

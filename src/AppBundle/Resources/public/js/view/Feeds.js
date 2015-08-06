@@ -3,10 +3,15 @@ var FeedsView = Backbone.View.extend({
 
     initialize: function() {
         feeds.on('sync', this.render.bind(this));
+        authorizationWindow.on('logout', this.empty.bind(this));
     },
 
     render: function() {
-        this.$el.empty();
+        this.empty();
+
+        if (feeds.length > 0) {
+            this.$el.append('<h2>Feeds</h2>');
+        }
 
         for(var i=0; i < feeds.length; i++) {
             var feedView = new FeedView();
@@ -16,6 +21,10 @@ var FeedsView = Backbone.View.extend({
         }
 
         return this;
+    },
+
+    empty: function() {
+        this.$el.empty();
     }
 });
 
