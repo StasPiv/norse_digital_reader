@@ -10,7 +10,7 @@ var Registration = Backbone.View.extend({
 
     events: {
         'click #register': 'register',
-        'keyup #password': 'getPasswordWeight'
+        'keyup #register_password': 'getPasswordWeight'
     },
 
     initialize: function() {
