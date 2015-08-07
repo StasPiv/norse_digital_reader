@@ -103,7 +103,7 @@ class Source
             $userId = App::getCurrentUserId();
         }
 
-        if (is_integer($source)) {
+        if (is_numeric($source)) {
             $entityForRemoving = $this->getById((int)$source);
             if (!is_null($entityForRemoving)) {
                 $source = $entityForRemoving->getSource();
@@ -155,7 +155,7 @@ class Source
      */
     public function update($source, $type = self::SOURCE_TYPE_RSS)
     {
-        if (is_integer($source)) {
+        if (is_numeric($source)) {
             $entity = $this->getById((int)$source);
             if (!is_null($entity)) {
                 $type = $entity->getType();
